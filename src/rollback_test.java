@@ -21,6 +21,7 @@ public class rollback_test {
     protected static Connection conn = null;
     protected static ResultSet rs = null;
     protected static int current;
+    protected static int repeat = 1;
 
     /**
      * @param args the command line arguments
@@ -50,10 +51,10 @@ public class rollback_test {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                while (repeat > 0) {
                     // Schrijf hier je eigen code 
                     try {
-
+                        Thread.sleep(3000);
                         int bestelling = 10;
                         stmt.executeUpdate("UPDATE voorraad SET amount = amount - " + bestelling + " WHERE name = 'Monitor'");
                         rs = stmt.executeQuery("SELECT * FROM voorraad");
@@ -80,6 +81,7 @@ public class rollback_test {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                repeat = 0;
                 }
             }
         }, "Thread 1").start();
@@ -87,12 +89,11 @@ public class rollback_test {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                while (repeat > 0) {
 
                     // Schrijf hier je eigen code 
                     try {
-
-                        Thread.sleep(1000);
+                        Thread.sleep(5000);
                         int bestelling = 20;
                         rs = stmt.executeQuery("SELECT * FROM voorraad");
                         while (rs.next()) {
@@ -100,22 +101,23 @@ public class rollback_test {
                                 current = Integer.parseInt(rs.getString(3));
                             }
                         }
-                        Thread.sleep(2000);
+                        Thread.sleep(3000);
                         stmt.executeUpdate("UPDATE voorraad SET amount = " + (current - bestelling) + " WHERE name = 'Monitor'");
+                        conn.commit();
                         rs = stmt.executeQuery("SELECT * FROM voorraad");
                         while (rs.next()) {
                             if (rs.getString(2).equals("Monitor")) {
                                 current = Integer.parseInt(rs.getString(3));
                             }
                         }
-                        System.out.println("3)Bestelling van " + bestelling + " producten, totaal nu op " + current);
-                        conn.commit();
-
+                        System.out.println("3)Tussen rollback: Bestelling van " + bestelling + " producten, totaal nu op " + current);
+                        
                     } catch (SQLException e1) {
                         e1.printStackTrace();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                repeat = 0;
                 }
             }
         }, "Thread 2").start();

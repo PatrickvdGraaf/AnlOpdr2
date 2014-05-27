@@ -58,12 +58,12 @@ public class deadlock {
                         conn = DriverManager.getConnection("jdbc:mysql://95.85.1.60:3306/opdracht_twee", "ANL", "ANL");
                         conn.setAutoCommit(false);
                         stmt = conn.createStatement();
-                        //stmt.execute("LOCK TABLES voorraad READ");
+                        stmt.execute("LOCK TABLES voorraad READ");
                         rs = stmt.executeQuery("SELECT * FROM voorraad");
 
                         // Slaap wachtTijd seconden 
                         Thread.sleep(3000);
-                        //stmt.execute("LOCK TABLES voorraad WRITE");
+                        stmt.execute("LOCK TABLES voorraad WRITE");
                         stmt.executeUpdate("UPDATE voorraad SET amount = 150 WHERE name = 'Monitor'");
                         stmt.executeQuery("UNLOCK TABLES");
                         conn.commit();
@@ -89,10 +89,10 @@ public class deadlock {
                         conn = DriverManager.getConnection("jdbc:mysql://95.85.1.60:3306/opdracht_twee", "ANL", "ANL");
                         conn.setAutoCommit(false);
                         stmt = conn.createStatement();
-                        //stmt.execute("LOCK TABLES voorraad READ");
+                        stmt.execute("LOCK TABLES voorraad READ");
                         
                         Thread.sleep(4000);                        
-                        //stmt.execute("LOCK TABLES voorraad WRITE");                        
+                        stmt.execute("LOCK TABLES voorraad WRITE");                        
                         stmt.executeUpdate("UPDATE voorraad SET amount = 200 WHERE name = 'Monitor'");                        
                         rs = stmt.executeQuery("SELECT * FROM voorraad");
                         while (rs.next()) {
